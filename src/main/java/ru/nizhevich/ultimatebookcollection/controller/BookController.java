@@ -13,23 +13,26 @@ import ru.nizhevich.ultimatebookcollection.model.ColumnConst;
 import ru.nizhevich.ultimatebookcollection.model.SortingConst;
 
 import java.util.List;
-import java.util.Objects;
+
+/**
+ * Эндпоинты для работы со списком книг.
+ */
 
 @RestController
 @RequestMapping("/api")
-public class TopTenBooksController {
+public class BookController {
 
     @Autowired
     private BookService bookService;
 
     @GetMapping("/test")
-    public String test(){
+    public String test() {
         return "Test";
     }
 
     @GetMapping("/allBooks")
-    public ResponseEntity<List<Book>> getAllBooks(){
-        return new ResponseEntity<>(bookService.getAllBooksFromCsvFile(), HttpStatus.OK);
+    public ResponseEntity<List<Book>> getAllBooks() {
+        return new ResponseEntity<>(bookService.getAllBooksFromCache(), HttpStatus.OK);
     }
 
     @GetMapping("/top10")
@@ -38,11 +41,6 @@ public class TopTenBooksController {
             @RequestParam(required = true) ColumnConst column,
             @RequestParam(required = true) SortingConst sort
     ) {
-        List<Book> books = bookService.getAllBooksFromCsvFile();
-        if (Objects.nonNull(year)) {
-            books = bookService.getBooksByYear(books, year);
-        }
-        books = bookService.getFilteredBooksByColumn(books, column, sort);
-        return new ResponseEntity<>(books, HttpStatus.OK);
+        return bookService.getTopTenBooks(year, column, sort);
     }
 }

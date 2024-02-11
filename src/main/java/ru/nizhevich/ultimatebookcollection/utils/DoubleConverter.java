@@ -3,6 +3,10 @@ package ru.nizhevich.ultimatebookcollection.utils;
 import com.opencsv.bean.AbstractBeanField;
 import com.opencsv.exceptions.CsvDataTypeMismatchException;
 
+/**
+ * Конвертер из String в Double.
+ * Для OpenCSV.
+ */
 public class DoubleConverter extends AbstractBeanField<Double, String> {
     @Override
     protected Object convert(String value) throws CsvDataTypeMismatchException {

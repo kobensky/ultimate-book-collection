@@ -10,10 +10,20 @@ import ru.nizhevich.ultimatebookcollection.utils.LongConverter;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * Модель книги из CSV файла.
+ */
+
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
 public class Book {
+    /**
+     * Строка в CSV файле содержащая жанры может быть представлена как список подстрок.
+     * Это регулярное выражение для разделения строки на подстроки.
+     * Делит по [ , ' ] и пробелу
+     */
+    private final static String SPLIT_GENRES_STRING = "[\\[',\\]\\s]+|'";
 
     @CsvCustomBindByPosition(position = 0, converter = LongConverter.class)
     private Long id;
@@ -42,7 +52,7 @@ public class Book {
     @CsvBindAndSplitByPosition(
             position = 11,
             elementType = String.class,
-            splitOn = "[\\[',\\]\\s]+|'",
+            splitOn = SPLIT_GENRES_STRING,
             collectionType = ArrayList.class
     )
     private List<String> genres;
@@ -55,6 +65,4 @@ public class Book {
 
     @CsvCustomBindByPosition(position = 14, converter = DoubleConverter.class)
     private Double numberOfVoters;
-
-    
 }
