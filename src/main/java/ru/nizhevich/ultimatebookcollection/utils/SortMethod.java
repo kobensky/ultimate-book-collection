@@ -16,8 +16,9 @@ import java.util.Map;
 import static ru.nizhevich.ultimatebookcollection.model.ColumnConst.*;
 
 /**
- * Бин для хранения методов сортировки по разным колонкам
+ * Бин для хранения методов сортировки по разным колонкам.
  */
+
 @Component
 @Scope(ConfigurableBeanFactory.SCOPE_SINGLETON)
 @NoArgsConstructor
@@ -34,6 +35,13 @@ public class SortMethod {
         sortedMethods.put(numberOfVoters, Comparator.comparing(Book::getNumberOfVoters));
     }
 
+    /**
+     * Метод получения компаратора в зависимости от условий.
+     *
+     * @param column колонка по которой хотим сортировать
+     * @param sort сортировка по возрастанию\убыванию
+     * @return компаратор
+     */
     public Comparator<Book> getComparator(ColumnConst column, SortingConst sort) {
         return sort == SortingConst.ASC ? sortedMethods.get(column) : sortedMethods.get(column).reversed();
     }

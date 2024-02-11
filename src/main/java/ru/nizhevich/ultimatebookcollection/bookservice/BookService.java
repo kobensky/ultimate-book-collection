@@ -19,20 +19,26 @@ import java.util.stream.Collectors;
 import static java.util.stream.Collectors.toList;
 
 /**
- * Сервис для обработки запросов на фильтрацию книг из кэша
+ * Сервис для обработки запросов на фильтрацию книг из кэша.
  *
  * @see BookCache
  */
 
 @Service
 public class BookService {
+
+    private final SortMethod sortedMethods;
+
+    private final BookCache bookCache;
+
     @Autowired
-    private SortMethod sortedMethods;
-    @Autowired
-    private BookCache bookCache;
+    public BookService(SortMethod sortMethod, BookCache bookCache) {
+        this.bookCache = bookCache;
+        this.sortedMethods = sortMethod;
+    }
 
     /**
-     * Получаем список книг из кэша
+     * Получаем список всех книг из кэша.
      *
      * @return
      */
@@ -41,7 +47,7 @@ public class BookService {
     }
 
     /**
-     * Метод получения первых 10 книг из списка по заданным условиям фильтрации и сортировки
+     * Метод получения первых 10 книг из списка по заданным условиям фильтрации и сортировки.
      *
      * @param year   необязательный параметр, год издания книги
      * @param column обязательный параметр, колонка для фильтрации
@@ -57,6 +63,15 @@ public class BookService {
         return new ResponseEntity<>(books, HttpStatus.OK);
     }
 
+    /**
+     * Метод получения первых 10 книг из списка по заданным условиям фильтрации и сортировки,
+     * без учёта года издания книги.
+     *
+     * @param books список книг для сортировки
+     * @param column колонка по которой нужно сортировать
+     * @param sort метод сортировки по возрастанию или убыванию
+     * @return список книг
+     */
     public List<Book> getFilteredBooksByColumn(List<Book> books, ColumnConst column, SortingConst sort) {
         return books.stream()
                 .sorted(sortedMethods.getComparator(column, sort))
@@ -65,12 +80,13 @@ public class BookService {
     }
 
     /**
-     * Метод возвращает список книг отфильтрованный по году
+     * Метод возвращает список книг отфильтрованный по году.
      *
      * @param year год издания книги
      * @return список книг
      */
-    public List<Book> getBooksByYear(List<Book> bookList, Integer year) {
+    private List<Book> getBooksByYear(List<Book> bookList, Integer year) {
+        // тут потенциальный баг, который я уже исправил в BookComparatorByDate
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("MMMM d, yyyy", Locale.ENGLISH);
         return bookList.stream()
                 .filter(book -> {
