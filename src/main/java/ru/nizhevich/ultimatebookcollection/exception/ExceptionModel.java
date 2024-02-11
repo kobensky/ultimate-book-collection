@@ -4,6 +4,10 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+/**
+ * Модель исключения для читаемых сообщений об ошибках
+ */
+
 @Data
 @NoArgsConstructor
 @AllArgsConstructor

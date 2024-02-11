@@ -1,6 +1,9 @@
 package ru.nizhevich.ultimatebookcollection.utils;
 
 import jakarta.annotation.PostConstruct;
+import lombok.NoArgsConstructor;
+import org.springframework.beans.factory.config.ConfigurableBeanFactory;
+import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 import ru.nizhevich.ultimatebookcollection.model.Book;
 import ru.nizhevich.ultimatebookcollection.model.ColumnConst;
@@ -12,9 +15,14 @@ import java.util.Map;
 
 import static ru.nizhevich.ultimatebookcollection.model.ColumnConst.*;
 
+/**
+ * Бин для хранения методов сортировки по разным колонкам
+ */
 @Component
+@Scope(ConfigurableBeanFactory.SCOPE_SINGLETON)
+@NoArgsConstructor
 public class SortMethod {
-    private Map<ColumnConst, Comparator<Book>> sortedMethods = new HashMap<>();
+    private static Map<ColumnConst, Comparator<Book>> sortedMethods = new HashMap<>();
 
     @PostConstruct
     public void init(){

@@ -1,19 +1,15 @@
 package ru.nizhevich.ultimatebookcollection.bookservice;
 
-import com.opencsv.bean.CsvToBean;
-import com.opencsv.bean.CsvToBeanBuilder;
-import jakarta.annotation.PostConstruct;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
+import ru.nizhevich.ultimatebookcollection.bookcache.BookCache;
 import ru.nizhevich.ultimatebookcollection.model.Book;
 import ru.nizhevich.ultimatebookcollection.model.ColumnConst;
 import ru.nizhevich.ultimatebookcollection.model.SortingConst;
 import ru.nizhevich.ultimatebookcollection.utils.SortMethod;
 
-import java.io.BufferedReader;
-import java.io.FileReader;
-import java.io.IOException;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
@@ -22,36 +18,43 @@ import java.util.stream.Collectors;
 
 import static java.util.stream.Collectors.toList;
 
+/**
+ * Сервис для обработки запросов на фильтрацию книг из кэша
+ *
+ * @see BookCache
+ */
+
 @Service
 public class BookService {
-    @Value("${csv.path}")
-    private String path;
     @Autowired
     private SortMethod sortedMethods;
+    @Autowired
+    private BookCache bookCache;
 
-    private static List<Book> allBooksFromCsvFile;
-
-    public List<Book> getAllBooksFromCsvFile() {
-        return new ArrayList<>(allBooksFromCsvFile);
+    /**
+     * Получаем список книг из кэша
+     *
+     * @return
+     */
+    public List<Book> getAllBooksFromCache() {
+        return bookCache.getAllBooksFromCsvFile();
     }
 
-    @PostConstruct
-    private void init() {
-        allBooksFromCsvFile = initCsvFile();
-    }
-
-    private List<Book> initCsvFile() {
-        CsvToBean<Book> csvToBean = null;
-        try {
-            csvToBean = new CsvToBeanBuilder<Book>(new BufferedReader(new FileReader(path)))
-                    .withType(Book.class)
-                    .withIgnoreEmptyLine(true)
-                    .withSkipLines(1)
-                    .build();
-        } catch (IOException e) {
-            throw new RuntimeException(e);
+    /**
+     * Метод получения первых 10 книг из списка по заданным условиям фильтрации и сортировки
+     *
+     * @param year   необязательный параметр, год издания книги
+     * @param column обязательный параметр, колонка для фильтрации
+     * @param sort   обязательный параметр, сортировка по возрастанию или убыванию
+     * @return список книг
+     */
+    public ResponseEntity<List<Book>> getTopTenBooks(Integer year, ColumnConst column, SortingConst sort) {
+        List<Book> books = getAllBooksFromCache();
+        if (Objects.nonNull(year)) {
+            books = getBooksByYear(books, year);
         }
-        return csvToBean.parse();
+        books = getFilteredBooksByColumn(books, column, sort);
+        return new ResponseEntity<>(books, HttpStatus.OK);
     }
 
     public List<Book> getFilteredBooksByColumn(List<Book> books, ColumnConst column, SortingConst sort) {

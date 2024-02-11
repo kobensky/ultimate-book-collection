@@ -1,5 +1,8 @@
 package ru.nizhevich.ultimatebookcollection.model;
 
+/**
+ * Константы для сортировки книг
+ */
 public enum ColumnConst {
     book("Название книги"),
     author("Автор книги"),
