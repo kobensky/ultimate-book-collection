@@ -10,11 +10,15 @@ import java.util.Locale;
 /**
  * Компаратор для сравнения по Дате публикации.
  */
+
 public class BookComparatorByDate implements Comparator<Book> {
+    /**
+     * Формат даты согласно формату представленному в CSV файле.
+     */
     private final SimpleDateFormat dateFormat = new SimpleDateFormat("MMMM d, yyyy", Locale.ENGLISH);
 
     /**
-     * Регулярное выражение, удаляющее первое слово из строки
+     * Регулярное выражение, удаляющее первое слово из строки.
      */
     private final static String DELETE_FIRST_WORD_REGEX = "^\\w+\\s";
 

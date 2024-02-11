@@ -3,6 +3,7 @@ package ru.nizhevich.ultimatebookcollection.model;
 /**
  * Константы методов сортировки
  */
+
 public enum SortingConst {
     ASC("По возрастанию"),
     DESC("По убыванию");

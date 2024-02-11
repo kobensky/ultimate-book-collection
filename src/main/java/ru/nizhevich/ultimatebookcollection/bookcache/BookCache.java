@@ -3,7 +3,7 @@ package ru.nizhevich.ultimatebookcollection.bookcache;
 import com.opencsv.bean.CsvToBean;
 import com.opencsv.bean.CsvToBeanBuilder;
 import jakarta.annotation.PostConstruct;
-import lombok.NoArgsConstructor;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.beans.factory.config.ConfigurableBeanFactory;
 import org.springframework.context.annotation.Scope;
@@ -25,10 +25,14 @@ import java.util.Objects;
 
 @Component
 @Scope(ConfigurableBeanFactory.SCOPE_SINGLETON)
-@NoArgsConstructor
 public class BookCache {
-    @Value("${csv.path}")
-    private static String path;
+
+    private final String path;
+
+    @Autowired
+    public BookCache(@Value("${csv.path}") String path) {
+        this.path = path;
+    }
 
     private static List<Book> allBooksFromCsvFile;
 
@@ -46,16 +50,18 @@ public class BookCache {
 
     private List<Book> initCsvFile() {
         CsvToBean<Book> csvToBean = null;
-        try {
-            csvToBean = new CsvToBeanBuilder<Book>(new BufferedReader(new FileReader(path)))
+        List<Book> resultBookList = null;
+        try (BufferedReader br = new BufferedReader(new FileReader(path))) {
+            csvToBean = new CsvToBeanBuilder<Book>(br)
                     .withType(Book.class)
                     .withIgnoreEmptyLine(true)
                     .withSkipLines(1)
                     .build();
+            resultBookList = csvToBean.parse();
         } catch (IOException ex) {
             throw new EmptyCacheException("The CSV file is empty or does not exists. Check the path to CSV file");
         }
-        return csvToBean.parse().stream()
+        return resultBookList.stream()
                 .peek(obj -> {
                     if (!obj.getGenres().isEmpty()) {
                         List<String> updatedGenres = obj.getGenres().subList(1, obj.getGenres().size());
