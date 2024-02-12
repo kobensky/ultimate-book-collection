@@ -1,4 +1,4 @@
-package ru.nizhevich.ultimatebookcollection.model;
+package ru.nizhevich.ultimatebookcollection.bookmodel;
 
 import com.opencsv.bean.CsvBindAndSplitByPosition;
 import com.opencsv.bean.CsvBindByPosition;

@@ -5,15 +5,15 @@ import lombok.NoArgsConstructor;
 import org.springframework.beans.factory.config.ConfigurableBeanFactory;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
-import ru.nizhevich.ultimatebookcollection.model.Book;
-import ru.nizhevich.ultimatebookcollection.model.ColumnConst;
-import ru.nizhevich.ultimatebookcollection.model.SortingConst;
+import ru.nizhevich.ultimatebookcollection.bookmodel.Book;
+import ru.nizhevich.ultimatebookcollection.bookmodel.ColumnConst;
+import ru.nizhevich.ultimatebookcollection.bookmodel.SortingConst;
 
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.Map;
 
-import static ru.nizhevich.ultimatebookcollection.model.ColumnConst.*;
+import static ru.nizhevich.ultimatebookcollection.bookmodel.ColumnConst.*;
 
 /**
  * Бин для хранения методов сортировки по разным колонкам.
@@ -23,16 +23,16 @@ import static ru.nizhevich.ultimatebookcollection.model.ColumnConst.*;
 @Scope(ConfigurableBeanFactory.SCOPE_SINGLETON)
 @NoArgsConstructor
 public class SortMethod {
-    private static Map<ColumnConst, Comparator<Book>> sortedMethods = new HashMap<>();
+    private static Map<ColumnConst, Comparator<Book>> SORTED_METHODS = new HashMap<>();
 
     @PostConstruct
     public void init(){
-        sortedMethods.put(book, Comparator.comparing(Book::getBook));
-        sortedMethods.put(author, Comparator.comparing(Book::getAuthor));
-        sortedMethods.put(numPages, Comparator.comparing(Book::getNumPages));
-        sortedMethods.put(publicationDate, new BookComparatorByDate());
-        sortedMethods.put(rating, Comparator.comparing(Book::getRating));
-        sortedMethods.put(numberOfVoters, Comparator.comparing(Book::getNumberOfVoters));
+        SORTED_METHODS.put(book, Comparator.comparing(Book::getBook));
+        SORTED_METHODS.put(author, Comparator.comparing(Book::getAuthor));
+        SORTED_METHODS.put(numPages, Comparator.comparing(Book::getNumPages));
+        SORTED_METHODS.put(publicationDate, new BookComparatorByDate());
+        SORTED_METHODS.put(rating, Comparator.comparing(Book::getRating));
+        SORTED_METHODS.put(numberOfVoters, Comparator.comparing(Book::getNumberOfVoters));
     }
 
     /**
@@ -43,6 +43,6 @@ public class SortMethod {
      * @return компаратор
      */
     public Comparator<Book> getComparator(ColumnConst column, SortingConst sort) {
-        return sort == SortingConst.ASC ? sortedMethods.get(column) : sortedMethods.get(column).reversed();
+        return sort == SortingConst.ASC ? SORTED_METHODS.get(column) : SORTED_METHODS.get(column).reversed();
     }
 }
