@@ -1,8 +1,6 @@
 package ru.nizhevich.ultimatebookcollection.bookservice;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import ru.nizhevich.ultimatebookcollection.bookcache.BookCache;
 import ru.nizhevich.ultimatebookcollection.bookmodel.Book;
@@ -26,6 +24,12 @@ import java.util.*;
 @Service
 public class BookService {
 
+    /**
+     * Параметр для установки количества выдаваемых книг.
+     * По умолчанию имеем ввиду Топ10 книг.
+     */
+    private final static int TOP_BOOKS_COUNT = 10;
+
     private final SortMethod sortedMethods;
     private final BookCache bookCache;
 
@@ -45,38 +49,38 @@ public class BookService {
     }
 
     /**
-     * Метод получения первых 10 книг из списка по заданным условиям фильтрации и сортировки.
+     * Метод получения книг из списка по заданным условиям фильтрации и сортировки.
      *
      * @param year   необязательный параметр, год издания книги
      * @param column обязательный параметр, колонка для фильтрации
      * @param sort   обязательный параметр, сортировка по возрастанию или убыванию
      * @return список книг
      */
-    public ResponseEntity<List<Book>> getTopTenBooks(Integer year, ColumnConst column, SortingConst sort) throws ContentNotFoundException{
+    public List<Book> getTopBooks(Integer year, ColumnConst column, SortingConst sort) throws ContentNotFoundException {
         List<Book> books = getAllBooksFromCache();
         if (Objects.nonNull(year)) {
             books = getBooksByYear(books, year);
         }
         books = getFilteredBooksByColumn(books, column, sort);
-        if(Objects.isNull(books) || books.isEmpty()) {
+        if (Objects.isNull(books) || books.isEmpty()) {
             throw new ContentNotFoundException("Book list is empty");
         }
-        return new ResponseEntity<>(books, HttpStatus.OK);
+        return books;
     }
 
     /**
-     * Метод получения первых 10 книг из списка по заданным условиям фильтрации и сортировки,
+     * Метод получения книг из списка по заданным условиям фильтрации и сортировки,
      * без учёта года издания книги.
      *
-     * @param books список книг для сортировки
+     * @param books  список книг для сортировки
      * @param column колонка по которой нужно сортировать
-     * @param sort метод сортировки по возрастанию или убыванию
+     * @param sort   метод сортировки по возрастанию или убыванию
      * @return список книг
      */
     public List<Book> getFilteredBooksByColumn(List<Book> books, ColumnConst column, SortingConst sort) {
         return books.stream()
                 .sorted(sortedMethods.getComparator(column, sort))
-                .limit(10)
+                .limit(TOP_BOOKS_COUNT)
                 .toList();
     }
 
