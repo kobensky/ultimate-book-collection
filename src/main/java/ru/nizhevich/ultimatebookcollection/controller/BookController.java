@@ -25,11 +25,6 @@ public class BookController {
     @Autowired
     private BookService bookService;
 
-    @GetMapping("/test")
-    public String test() {
-        return "Test";
-    }
-
     @GetMapping("/allBooks")
     public ResponseEntity<List<Book>> getAllBooks() {
         return new ResponseEntity<>(bookService.getAllBooksFromCache(), HttpStatus.OK);
@@ -41,6 +36,6 @@ public class BookController {
             @RequestParam(required = true) ColumnConst column,
             @RequestParam(required = true) SortingConst sort
     ) {
-        return bookService.getTopTenBooks(year, column, sort);
+        return new ResponseEntity<>(bookService.getTopBooks(year, column, sort), HttpStatus.OK);
     }
 }
