@@ -8,9 +8,9 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import ru.nizhevich.ultimatebookcollection.bookservice.BookService;
-import ru.nizhevich.ultimatebookcollection.model.Book;
-import ru.nizhevich.ultimatebookcollection.model.ColumnConst;
-import ru.nizhevich.ultimatebookcollection.model.SortingConst;
+import ru.nizhevich.ultimatebookcollection.bookmodel.Book;
+import ru.nizhevich.ultimatebookcollection.bookmodel.ColumnConst;
+import ru.nizhevich.ultimatebookcollection.bookmodel.SortingConst;
 
 import java.util.List;
 

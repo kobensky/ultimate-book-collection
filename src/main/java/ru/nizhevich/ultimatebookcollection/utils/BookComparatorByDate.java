@@ -1,6 +1,6 @@
 package ru.nizhevich.ultimatebookcollection.utils;
 
-import ru.nizhevich.ultimatebookcollection.model.Book;
+import ru.nizhevich.ultimatebookcollection.bookmodel.Book;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -45,7 +45,7 @@ public class BookComparatorByDate implements Comparator<Book> {
      * @param date строка с датой
      * @return новая строка
      */
-    private String deleteFirstWordIfExist(String date) {
+    public static String deleteFirstWordIfExist(String date) {
         if (date.split(" ").length > 3) {
             return  date.replaceFirst(DELETE_FIRST_WORD_REGEX, "");
         } else {

@@ -11,7 +11,7 @@ import org.springframework.core.io.ClassPathResource;
 import org.springframework.core.io.Resource;
 import org.springframework.stereotype.Component;
 import ru.nizhevich.ultimatebookcollection.exception.EmptyCacheException;
-import ru.nizhevich.ultimatebookcollection.model.Book;
+import ru.nizhevich.ultimatebookcollection.bookmodel.Book;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -22,7 +22,7 @@ import java.util.List;
 import java.util.Objects;
 
 /**
- * Класс по сути является кэшем, который инициализируется при старте приложения.
+ * Класс по сути является кэшем книг, который инициализируется при старте приложения.
  *
  */
 
@@ -32,7 +32,7 @@ public class BookCache {
 
     private final String path;
     private File csvFile;
-    private static List<Book> allBooksFromCsvFile;
+    private static List<Book> ALL_BOOKS_FROM_FILE;
 
     @Autowired
     public BookCache(@Value("${csv.path}") String path) {
@@ -50,15 +50,15 @@ public class BookCache {
     }
 
     public List<Book> getAllBooksFromCsvFile() throws EmptyCacheException {
-        if(Objects.isNull(allBooksFromCsvFile) || allBooksFromCsvFile.isEmpty()) {
+        if(Objects.isNull(ALL_BOOKS_FROM_FILE) || ALL_BOOKS_FROM_FILE.isEmpty()) {
             throw new EmptyCacheException("Cache have a problem");
         }
-        return new ArrayList<>(allBooksFromCsvFile);
+        return new ArrayList<>(ALL_BOOKS_FROM_FILE);
     }
 
     @PostConstruct
     private void init() {
-        allBooksFromCsvFile = initCsvFile();
+        ALL_BOOKS_FROM_FILE = initCsvFile();
     }
 
     private List<Book> initCsvFile() {

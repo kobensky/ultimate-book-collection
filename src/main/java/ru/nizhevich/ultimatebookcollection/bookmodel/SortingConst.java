@@ -1,4 +1,4 @@
-package ru.nizhevich.ultimatebookcollection.model;
+package ru.nizhevich.ultimatebookcollection.bookmodel;
 
 /**
  * Константы методов сортировки

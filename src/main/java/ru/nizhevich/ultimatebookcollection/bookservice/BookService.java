@@ -5,18 +5,17 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import ru.nizhevich.ultimatebookcollection.bookcache.BookCache;
-import ru.nizhevich.ultimatebookcollection.model.Book;
-import ru.nizhevich.ultimatebookcollection.model.ColumnConst;
-import ru.nizhevich.ultimatebookcollection.model.SortingConst;
+import ru.nizhevich.ultimatebookcollection.bookmodel.Book;
+import ru.nizhevich.ultimatebookcollection.bookmodel.ColumnConst;
+import ru.nizhevich.ultimatebookcollection.bookmodel.SortingConst;
+import ru.nizhevich.ultimatebookcollection.exception.ContentNotFoundException;
+import ru.nizhevich.ultimatebookcollection.utils.BookComparatorByDate;
 import ru.nizhevich.ultimatebookcollection.utils.SortMethod;
 
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
 import java.util.*;
-import java.util.stream.Collectors;
-
-import static java.util.stream.Collectors.toList;
 
 /**
  * Сервис для обработки запросов на фильтрацию книг из кэша.
@@ -28,7 +27,6 @@ import static java.util.stream.Collectors.toList;
 public class BookService {
 
     private final SortMethod sortedMethods;
-
     private final BookCache bookCache;
 
     @Autowired
@@ -40,7 +38,7 @@ public class BookService {
     /**
      * Получаем список всех книг из кэша.
      *
-     * @return
+     * @return список книг
      */
     public List<Book> getAllBooksFromCache() {
         return bookCache.getAllBooksFromCsvFile();
@@ -54,12 +52,15 @@ public class BookService {
      * @param sort   обязательный параметр, сортировка по возрастанию или убыванию
      * @return список книг
      */
-    public ResponseEntity<List<Book>> getTopTenBooks(Integer year, ColumnConst column, SortingConst sort) {
+    public ResponseEntity<List<Book>> getTopTenBooks(Integer year, ColumnConst column, SortingConst sort) throws ContentNotFoundException{
         List<Book> books = getAllBooksFromCache();
         if (Objects.nonNull(year)) {
             books = getBooksByYear(books, year);
         }
         books = getFilteredBooksByColumn(books, column, sort);
+        if(Objects.isNull(books) || books.isEmpty()) {
+            throw new ContentNotFoundException("Book list is empty");
+        }
         return new ResponseEntity<>(books, HttpStatus.OK);
     }
 
@@ -76,7 +77,7 @@ public class BookService {
         return books.stream()
                 .sorted(sortedMethods.getComparator(column, sort))
                 .limit(10)
-                .collect(toList());
+                .toList();
     }
 
     /**
@@ -86,17 +87,17 @@ public class BookService {
      * @return список книг
      */
     private List<Book> getBooksByYear(List<Book> bookList, Integer year) {
-        // тут потенциальный баг, который я уже исправил в BookComparatorByDate
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("MMMM d, yyyy", Locale.ENGLISH);
         return bookList.stream()
                 .filter(book -> {
                     try {
-                        LocalDate date = LocalDate.parse(book.getPublicationDate(), formatter);
+                        String dateStr = BookComparatorByDate.deleteFirstWordIfExist(book.getPublicationDate());
+                        LocalDate date = LocalDate.parse(dateStr, formatter);
                         return date.getYear() == year;
                     } catch (DateTimeParseException e) {
                         return false;
                     }
                 })
-                .collect(Collectors.toList());
+                .toList();
     }
 }

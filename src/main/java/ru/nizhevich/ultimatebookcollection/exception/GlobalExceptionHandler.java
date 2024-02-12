@@ -30,4 +30,9 @@ public class GlobalExceptionHandler {
     public ResponseEntity<ExceptionModel> handleArgumentNotValid(MethodArgumentNotValidException ex) {
         return new ResponseEntity<>(new ExceptionModel(ex.getMessage(), "Неверный параметр в запросе"), HttpStatus.BAD_REQUEST);
     }
+
+    @ExceptionHandler(ContentNotFoundException.class)
+    public ResponseEntity<ExceptionModel> handleNoContent(ContentNotFoundException ex) {
+        return new ResponseEntity<>(new ExceptionModel(ex.getMessage(), "По вашему запросу не найдено книг"), HttpStatus.NO_CONTENT);
+    }
 }
