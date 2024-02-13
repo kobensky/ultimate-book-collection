@@ -22,6 +22,11 @@
             -Возможные значения: ASC, DESC.
 
   2.  http://localhost:8080/api/allBooks - возвращает все книги из датасета.
+  3.  http://localhost:8080/api/book?bookName=Harry&sort=ASC
+        1. "bookName" - обязательный параметр, имя книги в любом регистре.
+        2. "sort" - обязательный параметр, сортировка по возрастанию/убыванию.
+
+           -Возможные значения: ASC, DESC.
 
 Используемый стек:
 Java 17, Spring boot 3.2.2, OpenCSV 5.7.1, Lombok, Maven.

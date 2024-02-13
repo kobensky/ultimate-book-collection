@@ -1,5 +1,6 @@
 package ru.nizhevich.ultimatebookcollection.bookservice;
 
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import ru.nizhevich.ultimatebookcollection.bookcache.BookCache;
@@ -21,6 +22,7 @@ import java.util.*;
  * @see BookCache
  */
 
+@Slf4j
 @Service
 public class BookService {
 
@@ -44,8 +46,17 @@ public class BookService {
      *
      * @return список книг
      */
-    public List<Book> getAllBooksFromCache() {
-        return bookCache.getAllBooksFromCsvFile();
+    public List<Book> getListOfBookFromCache() {
+        return bookCache.getListOfBooksFromCsvFile();
+    }
+
+    /**
+     * Получаем карту (название - книга) всех книг из кэша.
+     *
+     * @return карта книг
+     */
+    public Map<String, Book> geMapOfBooksFromCache() {
+        return bookCache.getMapOfBooksFromCsvFile();
     }
 
     /**
@@ -57,12 +68,13 @@ public class BookService {
      * @return список книг
      */
     public List<Book> getTopBooks(Integer year, ColumnConst column, SortingConst sort) throws ContentNotFoundException {
-        List<Book> books = getAllBooksFromCache();
+        List<Book> books = getListOfBookFromCache();
         if (Objects.nonNull(year)) {
             books = getBooksByYear(books, year);
         }
         books = getFilteredBooksByColumn(books, column, sort);
         if (Objects.isNull(books) || books.isEmpty()) {
+            log.error("По заданным параметрам нет книг");
             throw new ContentNotFoundException("Book list is empty");
         }
         return books;
@@ -103,5 +115,28 @@ public class BookService {
                     }
                 })
                 .toList();
+    }
+
+    /**
+     * Метод ищет книгу по названию и сортирует книги.
+     *
+     * @param bookName название книги
+     * @param sort метод сортировки
+     * @return список книг
+     */
+    public List<Book> getBookByName(String bookName, SortingConst sort) throws ContentNotFoundException {
+        Map<String, Book> bookMap = geMapOfBooksFromCache();
+        List<Book> foundBooks = bookMap.entrySet().stream()
+                .filter(entry -> entry.getKey().toLowerCase().startsWith(bookName.toLowerCase()))
+                .map(Map.Entry::getValue)
+                .sorted(sortedMethods.getComparator(ColumnConst.book, sort))
+                .toList();
+
+        if (!foundBooks.isEmpty()) {
+            return foundBooks;
+        } else {
+            log.error("Список книг с названием: " + bookName + " пуст");
+            throw new ContentNotFoundException("Book list is empty");
+        }
     }
 }
