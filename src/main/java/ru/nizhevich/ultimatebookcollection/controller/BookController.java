@@ -27,7 +27,7 @@ public class BookController {
 
     @GetMapping("/allBooks")
     public ResponseEntity<List<Book>> getAllBooks() {
-        return new ResponseEntity<>(bookService.getAllBooksFromCache(), HttpStatus.OK);
+        return new ResponseEntity<>(bookService.getListOfBookFromCache(), HttpStatus.OK);
     }
 
     @GetMapping("/top10")
@@ -37,5 +37,13 @@ public class BookController {
             @RequestParam(required = true) SortingConst sort
     ) {
         return new ResponseEntity<>(bookService.getTopBooks(year, column, sort), HttpStatus.OK);
+    }
+
+    @GetMapping("/book")
+    public ResponseEntity<List<Book>> getBooksByName(
+            @RequestParam(required = true) String bookName,
+            @RequestParam(required = true) SortingConst sort
+    ) {
+        return new ResponseEntity<>(bookService.getBookByName(bookName, sort), HttpStatus.OK);
     }
 }
